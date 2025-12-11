@@ -1,10 +1,5 @@
 import { useState } from 'react';
 
-interface Course {
-  id: string;
-  title: string;
-}
-
 const FeaturedCourseSection = () => {
   const [allCategoryCourses, setAllCategoryCourses] = useState('All Category Courses');
   const [selectedAllCourses, setSelectedAllCourses] = useState<string[]>([

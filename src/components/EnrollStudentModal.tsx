@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 interface Course {
   id: string;
@@ -19,7 +19,7 @@ interface EnrollStudentModalProps {
 }
 
 const EnrollStudentModal = ({ student, onClose, onEnroll }: EnrollStudentModalProps) => {
-  const [courses, setCourses] = useState<Course[]>([
+  const [courses] = useState<Course[]>([
     { id: '1', title: 'Introduction to React', instructor: 'John Doe' },
     { id: '2', title: 'Advanced JavaScript', instructor: 'Jane Smith' },
     { id: '3', title: 'Node.js Fundamentals', instructor: 'Mike Johnson' },

@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
+import type { ReactElement } from 'react';
 
 interface SettingCard {
   id: string;
   title: string;
-  icon: JSX.Element;
+  icon: ReactElement;
   route: string;
 }
 

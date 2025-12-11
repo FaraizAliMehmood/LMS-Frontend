@@ -108,7 +108,7 @@ const SocialLinks = () => {
         name: formData.name,
         url: formData.url,
         icon: formData.icon,
-        iconPreview: formData.iconPreview || null,
+        iconPreview: formData.iconPreview || undefined,
       };
       setSocialLinks([...socialLinks, newLink]);
     }
