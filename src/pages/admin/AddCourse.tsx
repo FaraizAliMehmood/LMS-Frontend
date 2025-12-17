@@ -7,26 +7,32 @@ const AddCourse = () => {
   const [formData, setFormData] = useState({
     instructor: 'Mark Davenport (instructortwo@gmail.com)',
     title: 'Artificial Intelligence in Business',
+    category: 'Business',
     slug: 'artificial-intelligence-in-business',
     seoDescription: 'Artificial Intelligence in Business',
     thumbnail: '/uploads/store/files/1001/my course images/flat-design-minimal-technology-youtube-thumbnail_23-2149153571_13_11zon.jpg',
     demoVideoStorage: 'youtube',
     demoVideoPath: 'https://www.youtube.com/watch?v=MHhlzlgFgJo',
+    courseType: 'paid', // 'free' or 'paid'
     price: '100',
+    hasDiscount: false,
     discountPrice: '',
+    status: 'Publish', // 'Draft' or 'Publish'
     description: '<p><strong>Laravel 10: Build Realtime Messaging App From Scratch (2024)</strong></p><p>Are you ready to take your Laravel skills to the next level? In this course, you will build a complete Realtime Messaging System project from scratch using Laravel 10 and Pusher. This project-based course is designed to help you become a professional Laravel developer and give you a competitive edge in the job market.</p><p><strong>Why Learn Laravel 10?</strong></p><p>Laravel 10 is the latest version of the popular PHP framework, packed with new features and improvements that make web development faster and more efficient.</p><p><strong>What Will You Learn?</strong></p><ul><li>User to User Live Chat</li></ul>',
   });
 
   const editorRef = useRef<HTMLDivElement>(null);
   const [wordCount, setWordCount] = useState(0);
-  const [chapters, setChapters] = useState<Array<{ id: string; title: string; type: 'lesson' | 'quiz'; lessons: Array<{ id: string; title: string; type: 'lesson' | 'quiz' }> }>>([]);
+  const [chapters, setChapters] = useState<Array<{ id: string; title: string; type: 'lesson' | 'quiz'; lessons: Array<{ id: string; title: string; type: 'lesson' | 'quiz'; timeLimit?: string; attempts?: string; questions?: Array<{ id: string; title: string; type: 'quiz' }> }> }>>([]);
   const [showChapterModal, setShowChapterModal] = useState(false);
   const [chapterTitle, setChapterTitle] = useState('introduction');
   const [chapterType, setChapterType] = useState<'lesson' | 'quiz'>('lesson');
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [showLessonModal, setShowLessonModal] = useState(false);
   const [showQuestionModal, setShowQuestionModal] = useState(false);
+  const [showQuizModal, setShowQuizModal] = useState(false);
   const [selectedChapterId, setSelectedChapterId] = useState<string | null>(null);
+  const [selectedQuizId, setSelectedQuizId] = useState<string | null>(null);
   const [lessonForm, setLessonForm] = useState({
     chapter: '',
     title: 'Promo: Introduction to laravel',
@@ -44,11 +50,33 @@ const AddCourse = () => {
     correctAnswer: '',
     marks: '1',
   });
+  const [quizForm, setQuizForm] = useState({
+    chapter: '',
+    title: 'QUIZ: This is a demo quiz test',
+    timeLimit: '10',
+    attempts: '10',
+  });
+  const [faqs, setFaqs] = useState<Array<{ id: string; question: string; answer: string }>>([]);
+  const [faqForm, setFaqForm] = useState({ question: '', answer: '' });
+  const [editingFaqId, setEditingFaqId] = useState<string | null>(null);
 
-  const instructors = [
-    'Mark Davenport (instructortwo@gmail.com)',
-    'Jason Thorne (jason@example.com)',
-    'Ethan Granger (ethan@example.com)',
+
+
+  const categories = [
+    'Business',
+    'Development',
+    'Design',
+    'Marketing',
+    'Photography',
+    'Music',
+    'Health & Fitness',
+    'Language',
+    'Science',
+    'Technology',
+    'Art',
+    'Finance',
+    'Education',
+    'Other',
   ];
 
   // Auto-generate slug from title
@@ -72,7 +100,7 @@ const AddCourse = () => {
     }
   }, []);
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -119,6 +147,7 @@ const AddCourse = () => {
           type: chapter.type,
           lessons: chapter.lessons,
         })),
+        faqs: faqs,
         createdAt: new Date().toISOString(),
       };
 
@@ -217,10 +246,50 @@ const AddCourse = () => {
   };
 
   const handleAddQuiz = (chapterId: string) => {
-    // Handle add quiz logic here
-    console.log('Add quiz to chapter:', chapterId);
+    const selectedChapter = chapters.find((ch) => ch.id === chapterId);
+    setSelectedChapterId(chapterId);
+    setQuizForm((prev) => ({
+      ...prev,
+      chapter: selectedChapter?.title || '',
+    }));
     setOpenDropdownId(null);
-    // You can open a modal or navigate to add quiz page here
+    setShowQuizModal(true);
+  };
+
+  const handleQuizFormChange = (field: string, value: string) => {
+    setQuizForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleCreateQuiz = () => {
+    if (selectedChapterId && quizForm.title.trim()) {
+      const newQuiz = {
+        id: Date.now().toString(),
+        title: quizForm.title.trim(),
+        type: 'quiz' as const,
+        timeLimit: quizForm.timeLimit || '',
+        attempts: quizForm.attempts || '',
+        questions: [],
+      };
+      setChapters(
+        chapters.map((chapter) =>
+          chapter.id === selectedChapterId
+            ? { ...chapter, lessons: [...chapter.lessons, newQuiz] }
+            : chapter
+        )
+      );
+      // Reset form
+      setQuizForm({
+        chapter: '',
+        title: 'QUIZ: This is a demo quiz test',
+        timeLimit: '10',
+        attempts: '10',
+      });
+      setShowQuizModal(false);
+      setSelectedChapterId(null);
+      // After creating quiz, allow adding questions
+      setSelectedQuizId(newQuiz.id);
+      setShowQuestionModal(true);
+    }
   };
 
   const handleAddQuestion = (chapterId: string) => {
@@ -260,7 +329,7 @@ const AddCourse = () => {
 
   const handleCreateQuestion = () => {
     if (
-      selectedChapterId &&
+      (selectedChapterId || selectedQuizId) &&
       questionForm.question.trim() &&
       questionForm.options.some((opt) => opt.trim()) &&
       questionForm.correctAnswer
@@ -270,13 +339,30 @@ const AddCourse = () => {
         title: questionForm.question.trim(),
         type: 'quiz' as const,
       };
-      setChapters(
-        chapters.map((chapter) =>
-          chapter.id === selectedChapterId
-            ? { ...chapter, lessons: [...chapter.lessons, newQuestion] }
-            : chapter
-        )
-      );
+      
+      // If adding to a quiz, find the quiz and add question to it
+      if (selectedQuizId) {
+        setChapters(
+          chapters.map((chapter) => ({
+            ...chapter,
+            lessons: chapter.lessons.map((lesson) =>
+              lesson.id === selectedQuizId
+                ? { ...lesson, questions: [...((lesson as any).questions || []), newQuestion] }
+                : lesson
+            ),
+          }))
+        );
+      } else if (selectedChapterId) {
+        // If adding to a chapter (quiz chapter), add as lesson
+        setChapters(
+          chapters.map((chapter) =>
+            chapter.id === selectedChapterId
+              ? { ...chapter, lessons: [...chapter.lessons, newQuestion] }
+              : chapter
+          )
+        );
+      }
+      
       // Reset form
       setQuestionForm({
         question: '',
@@ -287,7 +373,50 @@ const AddCourse = () => {
       });
       setShowQuestionModal(false);
       setSelectedChapterId(null);
+      // Keep selectedQuizId so user can add more questions
     }
+  };
+
+  const handleAddFaq = () => {
+    if (faqForm.question.trim() && faqForm.answer.trim()) {
+      if (editingFaqId) {
+        setFaqs(faqs.map(faq => 
+          faq.id === editingFaqId 
+            ? { ...faq, question: faqForm.question.trim(), answer: faqForm.answer.trim() }
+            : faq
+        ));
+        setEditingFaqId(null);
+      } else {
+        const newFaq = {
+          id: Date.now().toString(),
+          question: faqForm.question.trim(),
+          answer: faqForm.answer.trim(),
+        };
+        setFaqs([...faqs, newFaq]);
+      }
+      setFaqForm({ question: '', answer: '' });
+    }
+  };
+
+  const handleEditFaq = (id: string) => {
+    const faq = faqs.find(f => f.id === id);
+    if (faq) {
+      setFaqForm({ question: faq.question, answer: faq.answer });
+      setEditingFaqId(id);
+    }
+  };
+
+  const handleDeleteFaq = (id: string) => {
+    setFaqs(faqs.filter(faq => faq.id !== id));
+    if (editingFaqId === id) {
+      setEditingFaqId(null);
+      setFaqForm({ question: '', answer: '' });
+    }
+  };
+
+  const handleCancelFaqEdit = () => {
+    setEditingFaqId(null);
+    setFaqForm({ question: '', answer: '' });
   };
 
   const tabs = [
@@ -322,23 +451,7 @@ const AddCourse = () => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         {activeTab === 'basic' && (
           <div className="space-y-6">
-            {/* Instructor */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Instructor <span className="text-red-500">*</span>
-              </label>
-              <select
-                value={formData.instructor}
-                onChange={(e) => handleInputChange('instructor', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-              >
-                {instructors.map((instructor) => (
-                  <option key={instructor} value={instructor}>
-                    {instructor}
-                  </option>
-                ))}
-              </select>
-            </div>
+           
 
             {/* Title */}
             <div>
@@ -351,6 +464,25 @@ const AddCourse = () => {
                 onChange={(e) => handleInputChange('title', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
+            </div>
+
+            {/* Category */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Category <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={formData.category || ''}
+                onChange={(e) => handleInputChange('category', e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              >
+                <option value="">Select a category</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Slug */}
@@ -433,29 +565,6 @@ const AddCourse = () => {
               </div>
             </div>
 
-            {/* Price and Discount Price */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Price <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={formData.price}
-                  onChange={(e) => handleInputChange('price', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Discount Price</label>
-                <input
-                  type="text"
-                  value={formData.discountPrice}
-                  onChange={(e) => handleInputChange('discountPrice', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
-              </div>
-            </div>
           </div>
         )}
 
@@ -547,7 +656,8 @@ const AddCourse = () => {
                   title="Align Left"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18M3 18h18" />
+                    {/* Left aligned lines */}
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h10M4 10h14M4 14h12M4 18h16" />
                   </svg>
                 </button>
                 <button
@@ -557,7 +667,8 @@ const AddCourse = () => {
                   title="Align Center"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    {/* Center aligned lines */}
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 6h12M4 10h16M6 14h12M8 18h8" />
                   </svg>
                 </button>
                 <button
@@ -567,7 +678,8 @@ const AddCourse = () => {
                   title="Align Right"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10H3M21 14H3M21 18H3" />
+                    {/* Right aligned lines */}
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6h10M6 10h14M8 14h12M4 18h16" />
                   </svg>
                 </button>
                 <button
@@ -577,6 +689,7 @@ const AddCourse = () => {
                   title="Justify"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    {/* Fully justified lines */}
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                   </svg>
                 </button>
@@ -588,7 +701,9 @@ const AddCourse = () => {
                   title="Bullet List"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 6h13M8 12h13m-13 6h13M3 6h.01M3 12h.01M3 18h.01" />
+                    {/* Bulleted list */}
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 6h11M9 12h11M9 18h11" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 6h.01M5 12h.01M5 18h.01" />
                   </svg>
                 </button>
                 <button
@@ -598,7 +713,9 @@ const AddCourse = () => {
                   title="Numbered List"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                    {/* Numbered list (1,2,3 style) */}
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 6h9M11 12h9M11 18h9" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5h1v2M5 11h2l-2 2h2M5 17h2v2H5" />
                   </svg>
                 </button>
                 <button
@@ -608,7 +725,9 @@ const AddCourse = () => {
                   title="Decrease Indent"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12H3m18 0l-4-4m4 4l-4 4M3 12l4-4m-4 4l4 4" />
+                    {/* Outdent arrow and lines */}
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 6h13M7 10h9M7 14h13M7 18h9" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 10l3-2v4l-3-2z" />
                   </svg>
                 </button>
                 <button
@@ -618,7 +737,9 @@ const AddCourse = () => {
                   title="Increase Indent"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l4-4m0 0l4 4m-4-4v12" />
+                    {/* Indent arrow and lines */}
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h13M8 10h12M4 14h13M8 18h12" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 10l-3-2v4l3-2z" />
                   </svg>
                 </button>
               </div>
@@ -634,12 +755,205 @@ const AddCourse = () => {
                 <span className="text-sm text-gray-600 italic">{wordCount} words</span>
               </div>
             </div>
+
+            {/* Pricing Section */}
+            <div className="mt-8">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Pricing type <span className="text-red-500">*</span>
+              </label>
+              <div className="flex gap-4 mb-6">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="courseType"
+                    value="paid"
+                    checked={formData.courseType === 'paid'}
+                    onChange={(e) => {
+                      handleInputChange('courseType', e.target.value);
+                      if (e.target.value === 'free') {
+                        handleInputChange('hasDiscount', false);
+                        handleInputChange('discountPrice', '');
+                      }
+                    }}
+                    className="w-4 h-4 text-primary focus:ring-primary"
+                  />
+                  <span className="text-gray-700">Paid</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="courseType"
+                    value="free"
+                    checked={formData.courseType === 'free'}
+                    onChange={(e) => {
+                      handleInputChange('courseType', e.target.value);
+                      if (e.target.value === 'free') {
+                        handleInputChange('hasDiscount', false);
+                        handleInputChange('discountPrice', '');
+                      }
+                    }}
+                    className="w-4 h-4 text-primary focus:ring-primary"
+                  />
+                  <span className="text-gray-700">Free</span>
+                </label>
+              </div>
+
+              {/* Price - Only show for paid courses */}
+              {formData.courseType === 'paid' && (
+                <>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Price (₹0) <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.price}
+                      onChange={(e) => handleInputChange('price', e.target.value)}
+                      placeholder="Enter your course price (₹0)"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
+                  </div>
+
+                  {/* Discount Checkbox */}
+                  <div className="mb-4">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.hasDiscount}
+                        onChange={(e) => {
+                          handleInputChange('hasDiscount', e.target.checked);
+                          if (!e.target.checked) {
+                            handleInputChange('discountPrice', '');
+                          }
+                        }}
+                        className="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded"
+                      />
+                      <span className="text-sm text-gray-700">Check if this course has discount</span>
+                    </label>
+                  </div>
+
+                  {/* Discounted Price - Only show when discount checkbox is checked */}
+                  {formData.hasDiscount && (
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Discounted price
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.discountPrice}
+                        onChange={(e) => handleInputChange('discountPrice', e.target.value)}
+                        placeholder="Enter your discount price (₹0)"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* FAQs Section */}
+            <div className="mt-8">
+              <div className="flex items-center justify-between mb-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Frequently Asked Questions (FAQs)
+                </label>
+                <span className="text-xs text-gray-500">Students will see these before purchasing</span>
+              </div>
+              
+              {/* FAQ Form */}
+              <div className="border border-gray-300 rounded-md p-4 mb-4 bg-gray-50">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Question {editingFaqId ? '(Editing)' : ''}
+                    </label>
+                    <input
+                      type="text"
+                      value={faqForm.question}
+                      onChange={(e) => setFaqForm({ ...faqForm, question: e.target.value })}
+                      placeholder="Enter question..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Answer</label>
+                    <textarea
+                      value={faqForm.answer}
+                      onChange={(e) => setFaqForm({ ...faqForm, answer: e.target.value })}
+                      placeholder="Enter answer..."
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleAddFaq}
+                      disabled={!faqForm.question.trim() || !faqForm.answer.trim()}
+                      className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {editingFaqId ? 'Update FAQ' : 'Add FAQ'}
+                    </button>
+                    {editingFaqId && (
+                      <button
+                        onClick={handleCancelFaqEdit}
+                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* FAQs List */}
+              {faqs.length > 0 ? (
+                <div className="space-y-3">
+                  {faqs.map((faq) => (
+                    <div
+                      key={faq.id}
+                      className="border border-gray-300 rounded-md p-4 bg-white"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <h4 className="font-medium text-gray-900 mb-2">{faq.question}</h4>
+                          <p className="text-sm text-gray-600">{faq.answer}</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleEditFaq(faq.id)}
+                            className="text-blue-600 hover:text-blue-800 transition-colors"
+                            title="Edit FAQ"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteFaq(faq.id)}
+                            className="text-red-600 hover:text-red-800 transition-colors"
+                            title="Delete FAQ"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500 border border-gray-200 rounded-md bg-gray-50">
+                  <p>No FAQs added yet. Add questions and answers that students might have.</p>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
         {activeTab === 'contents' && (
           <div>
-            <div className="flex gap-4 mb-6">
+            <div className="flex justify-between items-center mb-6">
               <button
                 onClick={() => setShowChapterModal(true)}
                 className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors"
@@ -647,7 +961,7 @@ const AddCourse = () => {
                 Add new chapter
               </button>
               <button
-                className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors"
+                className="bg-primary text-white px-3 py-1.5 text-sm rounded-md hover:bg-primary-dark transition-colors"
               >
                 Sort chapter
               </button>
@@ -823,6 +1137,10 @@ const AddCourse = () => {
                   <p className="text-gray-900 mt-1">{formData.title}</p>
                 </div>
                 <div>
+                  <label className="text-sm font-medium text-gray-500">Category</label>
+                  <p className="text-gray-900 mt-1">{formData.category || 'Not provided'}</p>
+                </div>
+                <div>
                   <label className="text-sm font-medium text-gray-500">Slug</label>
                   <p className="text-gray-900 mt-1">{formData.slug}</p>
                 </div>
@@ -831,13 +1149,31 @@ const AddCourse = () => {
                   <p className="text-gray-900 mt-1">{formData.seoDescription || 'Not provided'}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Price</label>
-                  <p className="text-gray-900 mt-1">${formData.price}</p>
+                  <label className="text-sm font-medium text-gray-500">Course Type</label>
+                  <p className="text-gray-900 mt-1">
+                    <span className={`px-2 py-1 text-xs rounded-full ${
+                      formData.courseType === 'free' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-blue-100 text-blue-800'
+                    }`}>
+                      {formData.courseType === 'free' ? 'Free Course' : 'Paid Course'}
+                    </span>
+                  </p>
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Discount Price</label>
-                  <p className="text-gray-900 mt-1">{formData.discountPrice ? `$${formData.discountPrice}` : 'No discount'}</p>
-                </div>
+                {formData.courseType === 'paid' && (
+                  <>
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Price</label>
+                      <p className="text-gray-900 mt-1">₹{formData.price}</p>
+                    </div>
+                    {formData.hasDiscount && formData.discountPrice && (
+                      <div>
+                        <label className="text-sm font-medium text-gray-500">Discounted Price</label>
+                        <p className="text-gray-900 mt-1">₹{formData.discountPrice}</p>
+                      </div>
+                    )}
+                  </>
+                )}
                 <div>
                   <label className="text-sm font-medium text-gray-500">Thumbnail</label>
                   <p className="text-gray-900 mt-1 truncate">{formData.thumbnail || 'Not uploaded'}</p>
@@ -861,6 +1197,25 @@ const AddCourse = () => {
                 dangerouslySetInnerHTML={{ __html: formData.description || 'No description provided' }}
               />
             </div>
+
+            {/* FAQs Summary */}
+            {faqs.length > 0 && (
+              <div className="bg-white border border-gray-200 rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-200">
+                  Frequently Asked Questions
+                </h3>
+                <div className="space-y-4">
+                  {faqs.map((faq, index) => (
+                    <div key={faq.id} className="border border-gray-200 rounded-lg p-4">
+                      <h4 className="font-medium text-gray-900 mb-2">
+                        Q{index + 1}: {faq.question}
+                      </h4>
+                      <p className="text-sm text-gray-600 ml-4">A: {faq.answer}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Course Contents Summary */}
             <div className="bg-white border border-gray-200 rounded-lg p-6">
@@ -905,6 +1260,23 @@ const AddCourse = () => {
               )}
             </div>
 
+            {/* Status Field */}
+            <div className="bg-white border border-gray-200 rounded-lg p-6">
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Status <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => handleInputChange('status', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                >
+                  <option value="Draft">Draft</option>
+                  <option value="Publish">Publish</option>
+                </select>
+              </div>
+            </div>
+
             {/* Submit Button */}
             <div className="flex justify-end gap-4 pt-4">
               <button
@@ -915,10 +1287,15 @@ const AddCourse = () => {
               </button>
               <button
                 onClick={handleSaveCourse}
-                disabled={!formData.title || !formData.instructor || chapters.length === 0}
+                disabled={
+                  !formData.title || 
+                  !formData.instructor || 
+                  chapters.length === 0 ||
+                  (formData.courseType === 'paid' && !formData.price)
+                }
                 className="bg-primary text-white px-8 py-2 rounded-md hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Create Course
+                Save
               </button>
             </div>
           </div>
@@ -947,7 +1324,7 @@ const AddCourse = () => {
 
       {/* Add Chapter Modal */}
       {showChapterModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
             {/* Modal Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200">
@@ -995,24 +1372,7 @@ const AddCourse = () => {
                   }}
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Chapter Type <span className="text-red-500">*</span>
-                </label>
-                <select
-                  value={chapterType}
-                  onChange={(e) => setChapterType(e.target.value as 'lesson' | 'quiz')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                >
-                  <option value="lesson">Lesson Chapter</option>
-                  <option value="quiz">Quiz Chapter</option>
-                </select>
-                <p className="text-xs text-gray-500 mt-1">
-                  {chapterType === 'quiz' 
-                    ? 'Quiz chapters will show "Add Question" option instead of "Add Lesson" and "Add Quiz"'
-                    : 'Lesson chapters will show "Add Lesson" and "Add Quiz" options'}
-                </p>
-              </div>
+           
             </div>
 
             {/* Modal Footer */}
@@ -1030,7 +1390,7 @@ const AddCourse = () => {
 
       {/* Add Lesson Modal */}
       {showLessonModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
@@ -1212,13 +1572,135 @@ const AddCourse = () => {
         </div>
       )}
 
+      {/* Add Quiz Modal */}
+      {showQuizModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900">Add Quiz</h3>
+              <button
+                onClick={() => {
+                  setShowQuizModal(false);
+                  setSelectedChapterId(null);
+                  setQuizForm({
+                    chapter: '',
+                    title: 'QUIZ: This is a demo quiz test',
+                    timeLimit: '10',
+                    attempts: '10',
+                  });
+                }}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-4">
+              {/* Chapter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Chapter <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={quizForm.chapter}
+                  onChange={(e) => handleQuizFormChange('chapter', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                >
+                  {chapters.map((chapter) => (
+                    <option key={chapter.id} value={chapter.title}>
+                      {chapter.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Title */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Title <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={quizForm.title}
+                  onChange={(e) => handleQuizFormChange('title', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="Enter quiz title"
+                />
+              </div>
+
+              {/* Time Limit */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Time Limit <span className="text-red-500 text-xs">(leave empty for unlimited)</span>
+                </label>
+                <input
+                  type="text"
+                  value={quizForm.timeLimit}
+                  onChange={(e) => handleQuizFormChange('timeLimit', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="Enter time limit in minutes"
+                />
+              </div>
+
+              {/* Attempts */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Attempts <span className="text-red-500 text-xs">(leave empty for unlimited)</span>
+                </label>
+                <input
+                  type="text"
+                  value={quizForm.attempts}
+                  onChange={(e) => handleQuizFormChange('attempts', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="Enter number of attempts"
+                />
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex justify-end p-4 border-t border-gray-200">
+              <button
+                onClick={handleCreateQuiz}
+                disabled={!quizForm.title.trim() || !quizForm.chapter}
+                className="bg-primary text-white px-6 py-2 rounded-md hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Create
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Add Question Modal */}
       {showQuestionModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-900">Add Question</h3>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900">Add Question</h3>
+                {selectedQuizId && (
+                  <p className="text-sm text-gray-500 mt-1">
+                    Adding question to quiz: {(chapters
+                      .flatMap(ch => ch.lessons)
+                      .find(lesson => lesson.id === selectedQuizId) as any)?.title || 'Quiz'}
+                  </p>
+                )}
+              </div>
               <button
                 onClick={() => {
                   setShowQuestionModal(false);

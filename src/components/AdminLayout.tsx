@@ -6,9 +6,10 @@ const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [manageCoursesMenuOpen, setManageCoursesMenuOpen] = useState(false);
+  const [manageBlogsMenuOpen, setManageBlogsMenuOpen] = useState(false);
+  const [newsletterMenuOpen, setNewsletterMenuOpen] = useState(false);
   const [sectionsMenuOpen, setSectionsMenuOpen] = useState(false);
-  const [language, setLanguage] = useState('English');
-  const [currency, setCurrency] = useState('$-USD');
+
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -23,6 +24,14 @@ const AdminLayout = () => {
     const manageCoursesPaths = ['/admin/courses', '/admin/categories', '/admin/languages', '/admin/course-delete-requests'];
     if (isSubmenuActive(manageCoursesPaths)) {
       setManageCoursesMenuOpen(true);
+    }
+    const manageBlogsPaths = ['/admin/blogs', '/admin/blog-categories'];
+    if (isSubmenuActive(manageBlogsPaths)) {
+      setManageBlogsMenuOpen(true);
+    }
+    const newsletterPaths = ['/admin/newsletter/subscribers', '/admin/newsletter/send-bulk-mail'];
+    if (isSubmenuActive(newsletterPaths)) {
+      setNewsletterMenuOpen(true);
     }
     const sectionsPaths = ['/admin/hero-section', '/admin/about-section', '/admin/featured-course-section', '/admin/newsletter-section', '/admin/featured-instructor', '/admin/counter-section', '/admin/faq-section', '/admin/our-features-section', '/admin/banner-section', '/admin/contact-page-section'];
     if (isSubmenuActive(sectionsPaths)) {
@@ -52,54 +61,22 @@ const AdminLayout = () => {
               </svg>
             </button>
 
-            {/* Language Selector */}
-            <div className="relative">
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                className="bg-primary border border-white/30 text-white text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 pr-6 sm:pr-8 rounded-md focus:outline-none focus:ring-2 focus:ring-white focus:border-white appearance-none cursor-pointer hover:bg-primary-dark transition-colors"
-              >
-                <option value="English" className="bg-white text-gray-900">English</option>
-                <option value="Spanish" className="bg-white text-gray-900">Spanish</option>
-                <option value="French" className="bg-white text-gray-900">French</option>
-              </select>
-              <svg
-                className="absolute right-1.5 sm:right-2 top-1/2 transform -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 text-white pointer-events-none"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-
-            {/* Currency Selector */}
-            <div className="relative">
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-                className="bg-primary border border-white/30 text-white text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 pr-6 sm:pr-8 rounded-md focus:outline-none focus:ring-2 focus:ring-white focus:border-white appearance-none cursor-pointer hover:bg-primary-dark transition-colors"
-              >
-                <option value="$-USD" className="bg-white text-gray-900">$-USD</option>
-                <option value="€-EUR" className="bg-white text-gray-900">€-EUR</option>
-                <option value="£-GBP" className="bg-white text-gray-900">£-GBP</option>
-              </select>
-              <svg
-                className="absolute right-1.5 sm:right-2 top-1/2 transform -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 text-white pointer-events-none"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
           </div>
 
-        
-       
-
           {/* Right side - User Profile */}
-          <div className="flex items-center shrink-0">
+          <div className="flex items-center shrink-0 gap-3">
+            {/* Visit Page Button */}
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-white hover:bg-primary-dark px-3 sm:px-4 py-2 rounded-lg transition-colors"
+            >
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+              <span className="text-xs sm:text-sm hidden sm:inline">Visit Website</span>
+            </a>
             {/* User Menu */}
             <div className="relative">
               <button
@@ -271,6 +248,134 @@ const AdminLayout = () => {
             </svg>
             Manage Users
           </Link>
+          <Link
+            to="/admin/testimonials"
+            onClick={closeSidebar}
+            className={`flex items-center px-6 py-3 text-gray-700 hover:bg-primary hover:text-white transition-colors ${
+              isActive('/admin/testimonials') ? 'bg-primary text-white' : ''
+            }`}
+          >
+            <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            Testimonials
+          </Link>
+          <Link
+            to="/admin/faqs"
+            onClick={closeSidebar}
+            className={`flex items-center px-6 py-3 text-gray-700 hover:bg-primary hover:text-white transition-colors ${
+              isActive('/admin/faqs') ? 'bg-primary text-white' : ''
+            }`}
+          >
+            <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            FAQs
+          </Link>
+          {/* Newsletter Submenu */}
+          <div>
+            <button
+              onClick={() => setNewsletterMenuOpen(!newsletterMenuOpen)}
+              className={`w-full flex items-center justify-between px-6 py-3 text-gray-700 hover:bg-primary hover:text-white transition-colors ${
+                isSubmenuActive(['/admin/newsletter/subscribers', '/admin/newsletter/send-bulk-mail'])
+                  ? 'bg-primary text-white'
+                  : ''
+              }`}
+            >
+              <div className="flex items-center">
+                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
+                </svg>
+                NewsLetter
+              </div>
+              <svg
+                className={`w-4 h-4 transition-transform ${newsletterMenuOpen ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {newsletterMenuOpen && (
+              <div className="bg-gray-50">
+                <Link
+                  to="/admin/newsletter/subscribers"
+                  onClick={closeSidebar}
+                  className={`flex items-center px-6 py-2.5 pl-12 text-sm text-gray-700 hover:bg-primary hover:text-white transition-colors ${
+                    isActive('/admin/newsletter/subscribers') ? 'bg-primary text-white' : ''
+                  }`}
+                >
+                  Subscriber List
+                </Link>
+                <Link
+                  to="/admin/newsletter/send-bulk-mail"
+                  onClick={closeSidebar}
+                  className={`flex items-center px-6 py-2.5 pl-12 text-sm text-gray-700 hover:bg-primary hover:text-white transition-colors ${
+                    isActive('/admin/newsletter/send-bulk-mail') ? 'bg-primary text-white' : ''
+                  }`}
+                >
+                  Send Bulk Mail
+                </Link>
+              </div>
+            )}
+          </div>
+          {/* Manage Blogs Submenu */}
+          <div>
+            <button
+              onClick={() => setManageBlogsMenuOpen(!manageBlogsMenuOpen)}
+              className={`w-full flex items-center justify-between px-6 py-3 text-gray-700 hover:bg-primary hover:text-white transition-colors ${
+                isSubmenuActive(['/admin/blogs', '/admin/blog-categories']) ? 'bg-primary text-white' : ''
+              }`}
+            >
+              <div className="flex items-center">
+                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 10h16M4 14h10M4 18h8"
+                  />
+                </svg>
+                Manage Blogs
+              </div>
+              <svg
+                className={`w-4 h-4 transition-transform ${manageBlogsMenuOpen ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {manageBlogsMenuOpen && (
+              <div className="bg-gray-50">
+                <Link
+                  to="/admin/blogs"
+                  onClick={closeSidebar}
+                  className={`flex items-center px-6 py-2.5 pl-12 text-sm text-gray-700 hover:bg-primary hover:text-white transition-colors ${
+                    isActive('/admin/blogs') ? 'bg-primary text-white' : ''
+                  }`}
+                >
+                  Post List
+                </Link>
+                <Link
+                  to="/admin/blog-categories"
+                  onClick={closeSidebar}
+                  className={`flex items-center px-6 py-2.5 pl-12 text-sm text-gray-700 hover:bg-primary hover:text-white transition-colors ${
+                    isActive('/admin/blog-categories') ? 'bg-primary text-white' : ''
+                  }`}
+                >
+                  Category List
+                </Link>
+              </div>
+            )}
+          </div>
           {/* Sections Submenu */}
           <div>
             <button
@@ -413,6 +518,40 @@ const AdminLayout = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
             </svg>
             Social Links
+          </Link>
+          <Link
+            to="/admin/page-builder"
+            onClick={closeSidebar}
+            className={`flex items-center px-6 py-3 text-gray-700 hover:bg-primary hover:text-white transition-colors ${
+              isActive('/admin/page-builder') ? 'bg-primary text-white' : ''
+            }`}
+          >
+            <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 10h10M4 14h8M4 18h6"
+              />
+            </svg>
+            Page Builder
+          </Link>
+          <Link
+            to="/admin/menu-builder"
+            onClick={closeSidebar}
+            className={`flex items-center px-6 py-3 text-gray-700 hover:bg-primary hover:text-white transition-colors ${
+              isActive('/admin/menu-builder') ? 'bg-primary text-white' : ''
+            }`}
+          >
+            <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+            Menu Builder
           </Link>
           <Link
             to="/admin/footer"

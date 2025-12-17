@@ -6,81 +6,69 @@ interface Course {
   sn: number;
   title: string;
   category: string;
-  instructor: string;
   price: string;
   students: number;
   createdDate: string;
   updateDate: string;
   status: 'Published' | 'Draft';
-  approvalStatus: 'Approved' | 'Pending' | 'Rejected';
 }
 
 const ManageCourses = () => {
-  const [courses, setCourses] = useState<Course[]>([
+  const [courses] = useState<Course[]>([
     {
       id: '1',
       sn: 1,
       title: 'Artificial Intelligence in Business',
       category: 'SEO',
-      instructor: 'Mark Davenport',
       price: '$138.00',
       students: 1,
       createdDate: '04 Jul, 2024\n03:41',
       updateDate: '04 Jul, 2024\n03:41',
-      status: 'Published',
-      approvalStatus: 'Approved',
+      status: 'Published'
     },
     {
       id: '2',
       sn: 2,
       title: 'Remote Work Productivity: Tips and Tools',
       category: 'Music fundamentals',
-      instructor: 'Jason Thorne',
       price: '$182.00',
       students: 1,
       createdDate: '04 Jul, 2024\n03:41',
       updateDate: '04 Jul, 2024\n03:41',
-      status: 'Published',
-      approvalStatus: 'Approved',
+      status: 'Published'
     },
     {
       id: '3',
       sn: 3,
       title: 'Introduction to Financial Markets',
       category: 'Leadership',
-      instructor: 'Ethan Granger',
       price: '$150.00',
       students: 0,
       createdDate: '04 Jul, 2024\n03:41',
       updateDate: '04 Jul, 2024\n03:41',
-      status: 'Published',
-      approvalStatus: 'Approved',
+      status: 'Published'
     },
     {
       id: '4',
       sn: 4,
       title: 'Songwriting Basics: Crafting Melodies',
       category: 'Communication',
-      instructor: 'Nathaniel Cross',
       price: '$76.00',
       students: 0,
       createdDate: '04 Jul, 2024\n03:41',
       updateDate: '04 Jul, 2024\n03:41',
-      status: 'Published',
-      approvalStatus: 'Approved',
+      status: 'Published'
     },
     {
       id: '5',
       sn: 5,
       title: 'E-commerce Strategies for Small Businesses',
       category: 'Management',
-      instructor: 'Barclay Mcpherson',
       price: '$170.00',
       students: 0,
       createdDate: '04 Jul, 2024\n03:41',
       updateDate: '04 Jul, 2024\n03:41',
-      status: 'Published',
-      approvalStatus: 'Approved',
+      status: 'Published'
     },
   ]);
 
@@ -88,8 +76,6 @@ const ManageCourses = () => {
     search: '',
     date: '',
     category: '',
-    instructor: '',
-    approvalStatus: '',
     status: '',
     orderBy: '',
     perPage: '10',
@@ -106,18 +92,7 @@ const ManageCourses = () => {
     setActionMenuOpen(actionMenuOpen === courseId ? null : courseId);
   };
 
-  const toggleApprovalDropdown = (courseId: string) => {
-    setApprovalDropdownOpen(approvalDropdownOpen === courseId ? null : courseId);
-  };
 
-  const updateApprovalStatus = (courseId: string, status: 'Approved' | 'Pending' | 'Rejected') => {
-    setCourses(
-      courses.map((course) =>
-        course.id === courseId ? { ...course, approvalStatus: status } : course
-      )
-    );
-    setApprovalDropdownOpen(null);
-  };
 
   return (
     <div className="p-4">
@@ -159,36 +134,10 @@ const ManageCourses = () => {
               <option value="Management">Management</option>
             </select>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Instructor</label>
-            <select
-              value={filters.instructor}
-              onChange={(e) => handleFilterChange('instructor', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            >
-              <option value="">Select Instructor</option>
-              <option value="Mark Davenport">Mark Davenport</option>
-              <option value="Jason Thorne">Jason Thorne</option>
-              <option value="Ethan Granger">Ethan Granger</option>
-              <option value="Nathaniel Cross">Nathaniel Cross</option>
-              <option value="Barclay Mcpherson">Barclay Mcpherson</option>
-            </select>
-          </div>
+         
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Approval Status</label>
-            <select
-              value={filters.approvalStatus}
-              onChange={(e) => handleFilterChange('approvalStatus', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            >
-              <option value="">Select Status</option>
-              <option value="Approved">Approved</option>
-              <option value="Pending">Pending</option>
-              <option value="Rejected">Rejected</option>
-            </select>
-          </div>
+        
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
             <select
@@ -257,9 +206,7 @@ const ManageCourses = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Title
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Instructor
-                </th>
+               
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Price
                 </th>
@@ -275,9 +222,7 @@ const ManageCourses = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Approve
-                </th>
+             
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
@@ -293,9 +238,7 @@ const ManageCourses = () => {
                     <div className="text-sm font-medium text-gray-900">{course.title}</div>
                     <div className="text-sm text-gray-500 mt-1">{course.category}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {course.instructor}
-                  </td>
+                 
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {course.price}
                   </td>
@@ -313,51 +256,7 @@ const ManageCourses = () => {
                       {course.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="relative">
-                      <button
-                        onClick={() => toggleApprovalDropdown(course.id)}
-                        className="flex items-center gap-1 text-sm text-gray-700 hover:text-gray-900"
-                      >
-                        {course.approvalStatus}
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 9l-7 7-7-7"
-                          />
-                        </svg>
-                      </button>
-                      {approvalDropdownOpen === course.id && (
-                        <div className="absolute left-0 mt-1 w-32 bg-white rounded-md shadow-lg z-10 border border-gray-200">
-                          <button
-                            onClick={() => updateApprovalStatus(course.id, 'Approved')}
-                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          >
-                            Approved
-                          </button>
-                          <button
-                            onClick={() => updateApprovalStatus(course.id, 'Pending')}
-                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          >
-                            Pending
-                          </button>
-                          <button
-                            onClick={() => updateApprovalStatus(course.id, 'Rejected')}
-                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          >
-                            Rejected
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </td>
+              
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="relative">
                       <button
