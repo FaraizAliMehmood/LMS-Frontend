@@ -17,8 +17,13 @@
   font-family: "Outfit",sans-serif;
 }
 
-body {
+html, body {
   margin: 0;
   padding: 0;
   background-color: #f5f7fa;
+}
+
+#root {
+  background-color: #f5f7fa;
+  min-height: 100vh;
 }

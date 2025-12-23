@@ -123,7 +123,7 @@ const AdminLayout = () => {
       {/* Overlay for mobile */}
       {sidebarOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity"
+          className="lg:hidden fixed inset-0 bg-black/50 z-40 transition-opacity"
           onClick={closeSidebar}
         />
       )}
@@ -138,11 +138,11 @@ const AdminLayout = () => {
 
       {/* Sidebar */}
       <div
-        className={`fixed left-0 top-16 lg:top-0 h-[calc(100vh-4rem)] lg:h-full w-64 bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed left-0 top-16 lg:top-0 h-[calc(100vh-4rem)] lg:h-screen w-64 bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0`}
       >
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-gray-200 shrink-0">
           <h1 className="text-2xl font-bold text-primary hidden lg:block">LMS Admin</h1>
           <div className="lg:hidden flex items-center justify-between">
             <h1 className="text-xl font-bold text-primary">LMS Admin</h1>
@@ -157,7 +157,7 @@ const AdminLayout = () => {
             </button>
           </div>
         </div>
-        <nav className="mt-6">
+        <nav className="mt-6 overflow-y-auto flex-1 pb-6">
           <Link
             to="/admin/dashboard"
             onClick={closeSidebar}
@@ -213,26 +213,6 @@ const AdminLayout = () => {
                 >
                   Categories
                 </Link>
-                <Link
-                  to="/admin/languages"
-                  onClick={closeSidebar}
-                  className={`flex items-center px-6 py-2.5 pl-12 text-sm text-gray-700 hover:bg-primary hover:text-white transition-colors ${
-                    isActive('/admin/languages') ? 'bg-primary text-white' : ''
-                  }`}
-                >
-                  Languages
-                </Link>
-                
-                
-                <Link
-                  to="/admin/course-delete-requests"
-                  onClick={closeSidebar}
-                  className={`flex items-center px-6 py-2.5 pl-12 text-sm text-gray-700 hover:bg-primary hover:text-white transition-colors ${
-                    isActive('/admin/course-delete-requests') ? 'bg-primary text-white' : ''
-                  }`}
-                >
-                  Course Delete Requests
-                </Link>
               </div>
             )}
           </div>
@@ -248,6 +228,57 @@ const AdminLayout = () => {
             </svg>
             Manage Users
           </Link>
+          {/* Manage Blogs Submenu */}
+          <div>
+            <button
+              onClick={() => setManageBlogsMenuOpen(!manageBlogsMenuOpen)}
+              className={`w-full flex items-center justify-between px-6 py-3 text-gray-700 hover:bg-primary hover:text-white transition-colors ${
+                isSubmenuActive(['/admin/blogs', '/admin/blog-categories']) ? 'bg-primary text-white' : ''
+              }`}
+            >
+              <div className="flex items-center">
+                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 10h16M4 14h10M4 18h8"
+                  />
+                </svg>
+                Manage Blogs
+              </div>
+              <svg
+                className={`w-4 h-4 transition-transform ${manageBlogsMenuOpen ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {manageBlogsMenuOpen && (
+              <div className="bg-gray-50">
+                <Link
+                  to="/admin/blogs"
+                  onClick={closeSidebar}
+                  className={`flex items-center px-6 py-2.5 pl-12 text-sm text-gray-700 hover:bg-primary hover:text-white transition-colors ${
+                    isActive('/admin/blogs') ? 'bg-primary text-white' : ''
+                  }`}
+                >
+                  Post List
+                </Link>
+                <Link
+                  to="/admin/blog-categories"
+                  onClick={closeSidebar}
+                  className={`flex items-center px-6 py-2.5 pl-12 text-sm text-gray-700 hover:bg-primary hover:text-white transition-colors ${
+                    isActive('/admin/blog-categories') ? 'bg-primary text-white' : ''
+                  }`}
+                >
+                  Category List
+                </Link>
+              </div>
+            )}
+          </div>
           <Link
             to="/admin/testimonials"
             onClick={closeSidebar}
@@ -321,57 +352,6 @@ const AdminLayout = () => {
                   }`}
                 >
                   Send Bulk Mail
-                </Link>
-              </div>
-            )}
-          </div>
-          {/* Manage Blogs Submenu */}
-          <div>
-            <button
-              onClick={() => setManageBlogsMenuOpen(!manageBlogsMenuOpen)}
-              className={`w-full flex items-center justify-between px-6 py-3 text-gray-700 hover:bg-primary hover:text-white transition-colors ${
-                isSubmenuActive(['/admin/blogs', '/admin/blog-categories']) ? 'bg-primary text-white' : ''
-              }`}
-            >
-              <div className="flex items-center">
-                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 10h16M4 14h10M4 18h8"
-                  />
-                </svg>
-                Manage Blogs
-              </div>
-              <svg
-                className={`w-4 h-4 transition-transform ${manageBlogsMenuOpen ? 'rotate-180' : ''}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-            {manageBlogsMenuOpen && (
-              <div className="bg-gray-50">
-                <Link
-                  to="/admin/blogs"
-                  onClick={closeSidebar}
-                  className={`flex items-center px-6 py-2.5 pl-12 text-sm text-gray-700 hover:bg-primary hover:text-white transition-colors ${
-                    isActive('/admin/blogs') ? 'bg-primary text-white' : ''
-                  }`}
-                >
-                  Post List
-                </Link>
-                <Link
-                  to="/admin/blog-categories"
-                  onClick={closeSidebar}
-                  className={`flex items-center px-6 py-2.5 pl-12 text-sm text-gray-700 hover:bg-primary hover:text-white transition-colors ${
-                    isActive('/admin/blog-categories') ? 'bg-primary text-white' : ''
-                  }`}
-                >
-                  Category List
                 </Link>
               </div>
             )}
@@ -569,7 +549,7 @@ const AdminLayout = () => {
       </div>
 
       {/* Main Content */}
-      <div className="lg:ml-64 pt-20 lg:pt-16 p-4 lg:p-8">
+      <div className="lg:ml-64 pt-20 lg:pt-16 p-4 lg:p-8 bg-gray-50 min-h-screen">
         <Outlet />
       </div>
     </div>

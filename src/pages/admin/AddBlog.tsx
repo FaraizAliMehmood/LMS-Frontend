@@ -4,6 +4,7 @@ import {  Link } from 'react-router-dom';
 const AddBlog = () => {
   const editorRef = useRef<HTMLDivElement>(null);
   const [wordCount, setWordCount] = useState(0);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
   
   const [formData, setFormData] = useState({
     thumbnail: '',
@@ -86,6 +87,17 @@ const AddBlog = () => {
           <div className="text-sm text-gray-600">
             Dashboard / Blog List / Create Post
           </div>
+          <button
+            onClick={() => setShowPreviewModal(true)}
+            className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+            title="Preview Blog Frontend View"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            Preview Frontend
+          </button>
           <Link
             to="/admin/blogs"
             className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary-dark transition-colors flex items-center gap-2"
@@ -456,6 +468,173 @@ const AddBlog = () => {
           </div>
         </form>
       </div>
+
+      {/* Preview Modal */}
+      {showPreviewModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900">Blog Frontend Preview</h3>
+              <button
+                onClick={() => setShowPreviewModal(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
+              <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+                {/* Blog Header Image */}
+                {formData.thumbnail && (
+                  <div className="relative h-64 bg-gray-200">
+                    <img
+                      src={formData.thumbnail}
+                      alt={formData.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                    {!formData.thumbnail.includes('http') && (
+                      <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                        <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Blog Content */}
+                <div className="p-8">
+                  {/* Category and Meta */}
+                  <div className="flex items-center gap-3 mb-4">
+                    {formData.category && (
+                      <span className="px-3 py-1 text-sm font-semibold text-primary bg-primary/10 rounded-full">
+                        {formData.category}
+                      </span>
+                    )}
+                    {formData.popular && (
+                      <span className="px-3 py-1 text-sm font-semibold text-orange-600 bg-orange-100 rounded-full">
+                        Popular
+                      </span>
+                    )}
+                    {formData.showHomepage && (
+                      <span className="px-3 py-1 text-sm font-semibold text-green-600 bg-green-100 rounded-full">
+                        Featured
+                      </span>
+                    )}
+                    <span className="text-sm text-gray-500">
+                      {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                    </span>
+                  </div>
+
+                  {/* Title */}
+                  <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                    {formData.title || 'Blog Post Title'}
+                  </h1>
+
+                  {/* Tags */}
+                  {formData.tags && (
+                    <div className="flex flex-wrap items-center gap-2 mb-6">
+                      {formData.tags.split(',').map((tag, index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1 text-sm text-gray-600 bg-gray-100 rounded-full"
+                        >
+                          #{tag.trim()}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Content */}
+                  <div className="prose max-w-none">
+                    {formData.description ? (
+                      <div
+                        className="text-gray-700 leading-relaxed"
+                        dangerouslySetInnerHTML={{ __html: formData.description }}
+                      />
+                    ) : (
+                      <p className="text-gray-500 italic">No content added yet. Add content to see the preview.</p>
+                    )}
+                  </div>
+
+                  {/* SEO Info (if available) */}
+                  {(formData.seoTitle || formData.seoDescription) && (
+                    <div className="mt-8 pt-6 border-t border-gray-200">
+                      <h3 className="text-sm font-semibold text-gray-500 uppercase mb-3">SEO Information</h3>
+                      {formData.seoTitle && (
+                        <div className="mb-2">
+                          <span className="text-sm font-medium text-gray-600">SEO Title: </span>
+                          <span className="text-sm text-gray-900">{formData.seoTitle}</span>
+                        </div>
+                      )}
+                      {formData.seoDescription && (
+                        <div>
+                          <span className="text-sm font-medium text-gray-600">SEO Description: </span>
+                          <span className="text-sm text-gray-900">{formData.seoDescription}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Blog Card Preview (for listing view) */}
+                  <div className="mt-12 pt-8 border-t border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">How it appears in blog listing:</h3>
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      {formData.thumbnail && (
+                        <div className="relative h-48 bg-gray-200">
+                          <img
+                            src={formData.thumbnail}
+                            alt={formData.title}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      )}
+                      <div className="p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          {formData.category && (
+                            <span className="px-2 py-1 text-xs font-semibold text-primary bg-primary/10 rounded">
+                              {formData.category}
+                            </span>
+                          )}
+                          {formData.popular && (
+                            <span className="px-2 py-1 text-xs font-semibold text-orange-600 bg-orange-100 rounded">
+                              Popular
+                            </span>
+                          )}
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+                          {formData.title || 'Blog Post Title'}
+                        </h3>
+                        <p className="text-sm text-gray-600 mb-3 line-clamp-3">
+                          {formData.description
+                            ? editorRef.current?.innerText?.substring(0, 150) || 'Blog post description...'
+                            : 'No description available'}
+                          ...
+                        </p>
+                        <div className="flex items-center justify-between text-xs text-gray-500">
+                          <span>{new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                          <span className="text-primary hover:underline cursor-pointer">Read More →</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

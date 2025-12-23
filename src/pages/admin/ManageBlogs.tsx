@@ -63,14 +63,6 @@ const ManageBlogs = () => {
     );
   };
 
-  const togglePopular = (id: string) => {
-    setPosts(
-      posts.map((post) =>
-        post.id === id ? { ...post, popular: !post.popular } : post
-      )
-    );
-  };
-
   const toggleStatus = (id: string) => {
     setPosts(
       posts.map((post) =>
@@ -114,18 +106,7 @@ const ManageBlogs = () => {
               <option value="no">No</option>
             </select>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Popular</label>
-            <select
-              value={filters.popular}
-              onChange={(e) => handleFilterChange('popular', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            >
-              <option value="">Select Popular</option>
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </select>
-          </div>
+         
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
             <select
@@ -199,9 +180,7 @@ const ManageBlogs = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Show Homepage
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Popular
-                </th>
+               
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
@@ -234,16 +213,7 @@ const ManageBlogs = () => {
                       {post.showHomepage ? 'Yes' : 'No'}
                     </button>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <button
-                      onClick={() => togglePopular(post.id)}
-                      className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        post.popular ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      {post.popular ? 'Yes' : 'No'}
-                    </button>
-                  </td>
+                 
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center gap-2">
                       <span
