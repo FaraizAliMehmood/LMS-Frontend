@@ -21,6 +21,7 @@ import SendBulkMail from './pages/admin/SendBulkMail';
 import ContactPageSection from './pages/admin/ContactPageSection';
 import Footer from './pages/admin/Footer';
 import ManageUsers from './pages/admin/ManageUsers';
+import ManageOrders from './pages/admin/ManageOrders';
 import SectionSettings from './pages/admin/SectionSettings';
 import Settings from './pages/admin/Settings';
 import GeneralSettings from './pages/admin/GeneralSettings';
@@ -63,6 +64,8 @@ function App() {
           <Route path="course-reviews" element={<ManageCourses />} />
           <Route path="course-delete-requests" element={<ManageCourses />} />
           <Route path="users" element={<ManageUsers />} />
+          <Route path="orders/history" element={<ManageOrders defaultTab="history" />} />
+          <Route path="orders/pending" element={<ManageOrders defaultTab="pending" />} />
           <Route path="section-settings" element={<SectionSettings />} />
           <Route path="settings" element={<Settings />} />
           <Route path="settings/general" element={<GeneralSettings />} />

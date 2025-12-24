@@ -120,18 +120,7 @@ const ManageBlogs = () => {
             </select>
           </div>
           <div className="grid grid-cols-2 gap-4 md:block">
-            <div className="mb-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Order By</label>
-              <select
-                value={filters.orderBy}
-                onChange={(e) => handleFilterChange('orderBy', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-              >
-                <option value="">Order By</option>
-                <option value="title">Title</option>
-                <option value="category">Category</option>
-              </select>
-            </div>
+          
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Per Page</label>
               <select

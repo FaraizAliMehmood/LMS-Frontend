@@ -105,7 +105,7 @@ const AddBlog = () => {
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            ←Back
+            Back
           </Link>
         </div>
       </div>
@@ -133,12 +133,9 @@ const AddBlog = () => {
                 className="cursor-pointer inline-block"
               >
                 <div className="flex flex-col items-center">
-                  <button
-                    type="button"
-                    className="bg-gray-200 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-300 transition-colors"
-                  >
+                  <div className="bg-gray-200 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-300 transition-colors">
                     IMAGE
-                  </button>
+                  </div>
                   {formData.thumbnail && (
                     <p className="mt-2 text-sm text-gray-600">{formData.thumbnail}</p>
                   )}

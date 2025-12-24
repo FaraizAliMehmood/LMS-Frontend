@@ -1608,10 +1608,7 @@ const AddCourse = () => {
                 Basic Information
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Instructor</label>
-                  <p className="text-gray-900 mt-1">{formData.instructor}</p>
-                </div>
+              
                 <div>
                   <label className="text-sm font-medium text-gray-500">Title</label>
                   <p className="text-gray-900 mt-1">{formData.title}</p>
@@ -1855,19 +1852,6 @@ const AddCourse = () => {
                     }
                   }}
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Type <span className="text-red-500">*</span>
-                </label>
-                <select
-                  value={chapterType}
-                  onChange={(e) => setChapterType(e.target.value as 'lesson' | 'quiz')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                >
-                  <option value="lesson">Lesson Chapter</option>
-                  <option value="quiz">Quiz Chapter</option>
-                </select>
               </div>
            
             </div>

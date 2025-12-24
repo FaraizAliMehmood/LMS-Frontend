@@ -7,6 +7,7 @@ const AdminLayout = () => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [manageCoursesMenuOpen, setManageCoursesMenuOpen] = useState(false);
   const [manageBlogsMenuOpen, setManageBlogsMenuOpen] = useState(false);
+  const [manageOrdersMenuOpen, setManageOrdersMenuOpen] = useState(false);
   const [newsletterMenuOpen, setNewsletterMenuOpen] = useState(false);
   const [sectionsMenuOpen, setSectionsMenuOpen] = useState(false);
 
@@ -28,6 +29,10 @@ const AdminLayout = () => {
     const manageBlogsPaths = ['/admin/blogs', '/admin/blog-categories'];
     if (isSubmenuActive(manageBlogsPaths)) {
       setManageBlogsMenuOpen(true);
+    }
+    const manageOrdersPaths = ['/admin/orders/history', '/admin/orders/pending'];
+    if (isSubmenuActive(manageOrdersPaths)) {
+      setManageOrdersMenuOpen(true);
     }
     const newsletterPaths = ['/admin/newsletter/subscribers', '/admin/newsletter/send-bulk-mail'];
     if (isSubmenuActive(newsletterPaths)) {
@@ -228,6 +233,57 @@ const AdminLayout = () => {
             </svg>
             Manage Users
           </Link>
+          {/* Manage Orders Submenu */}
+          <div>
+            <button
+              onClick={() => setManageOrdersMenuOpen(!manageOrdersMenuOpen)}
+              className={`w-full flex items-center justify-between px-6 py-3 text-gray-700 hover:bg-primary hover:text-white transition-colors ${
+                isSubmenuActive(['/admin/orders/history', '/admin/orders/pending']) ? 'bg-primary text-white' : ''
+              }`}
+            >
+              <div className="flex items-center">
+                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                  />
+                </svg>
+                Manage Orders
+              </div>
+              <svg
+                className={`w-4 h-4 transition-transform ${manageOrdersMenuOpen ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {manageOrdersMenuOpen && (
+              <div className="bg-gray-50">
+                <Link
+                  to="/admin/orders/history"
+                  onClick={closeSidebar}
+                  className={`flex items-center px-6 py-2.5 pl-12 text-sm text-gray-700 hover:bg-primary hover:text-white transition-colors ${
+                    isActive('/admin/orders/history') ? 'bg-primary text-white' : ''
+                  }`}
+                >
+                  Order History
+                </Link>
+                <Link
+                  to="/admin/orders/pending"
+                  onClick={closeSidebar}
+                  className={`flex items-center px-6 py-2.5 pl-12 text-sm text-gray-700 hover:bg-primary hover:text-white transition-colors ${
+                    isActive('/admin/orders/pending') ? 'bg-primary text-white' : ''
+                  }`}
+                >
+                  Order Pending
+                </Link>
+              </div>
+            )}
+          </div>
           {/* Manage Blogs Submenu */}
           <div>
             <button
@@ -511,7 +567,7 @@ const AdminLayout = () => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M4 6h16M4 10h10M4 14h8M4 18h6"
+                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
               />
             </svg>
             Page Builder
